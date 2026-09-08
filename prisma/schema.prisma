@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  HEAD_ADMIN
+}
+
+enum SongStatus {
+  PENDING
+  PUBLISHED
+}
+
+enum RequestStatus {
+  OPEN
+  CLOSED
+}
+
+model Profile {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String   @unique
+  username     String?
+  passwordHash String?
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  songRequests SongRequest[]
+  chatMessages ChatMessage[]
+
+  @@index([role])
+}
+model Song {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  artist      String?
+  slug        String     @unique
+  originalKey String?
+  capo        Int?
+  content     String
+  status      SongStatus @default(PENDING)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([status])
+  @@index([title])
+  @@index([artist])
+}
+
+model SongRequest {
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String        @db.Uuid
+  title     String
+  artist    String?
+  note      String?
+  status    RequestStatus @default(OPEN)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  user     Profile      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model ChatMessage {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  requestId String   @db.Uuid
+  senderId  String   @db.Uuid
+  body      String
+  createdAt DateTime @default(now())
+
+  request SongRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  sender  Profile     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([requestId, createdAt])
+}
