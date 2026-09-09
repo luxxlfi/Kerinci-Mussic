@@ -37,7 +37,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-8 shadow-2xl">
         <div className="text-center">
           <Link href="/" className="text-2xl font-black text-emerald-400">
-            🎸 ChordGitar.id
+            Kincai Mania
           </Link>
           <h1 className="mt-4 text-2xl font-bold text-white">
             {isRegister ? "Buat Akun Baru" : "Masuk ke Akun Kamu"}
