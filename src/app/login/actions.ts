@@ -61,11 +61,8 @@ export async function registerAction(formData: FormData) {
     throw new Error(error.message);
   }
 
-  // Simpan profile baru ke database Prisma
+  // Simpan profile baru ke database Prisma (default selalu USER)
   if (data.user) {
-    const totalUsers = await prisma.profile.count();
-    const role = totalUsers === 0 ? "HEAD_ADMIN" : "USER";
-
     await prisma.profile.upsert({
       where: { email: data.user.email! },
       update: {},
@@ -73,7 +70,7 @@ export async function registerAction(formData: FormData) {
         id: data.user.id,
         email: data.user.email!,
         username: username || data.user.email!.split("@")[0],
-        role,
+        role: "USER",
       },
     });
 

@@ -16,14 +16,6 @@ export default async function RequestPage() {
 
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100 font-sans">
-      <header className="border-b border-zinc-800 bg-zinc-950 px-6 py-4">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-emerald-400">
-            🎸 ChordGitar.id
-          </Link>
-        </div>
-      </header>
-
       <main className="mx-auto max-w-4xl px-6 py-10">
         <h1 className="text-3xl font-extrabold text-white">Request Lagu Baru</h1>
         <p className="mt-2 text-zinc-400">

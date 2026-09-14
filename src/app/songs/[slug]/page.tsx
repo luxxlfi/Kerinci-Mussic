@@ -21,20 +21,16 @@ export default async function SongDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100 font-sans">
-      {/* Header Navbar */}
-      <header className="border-b border-zinc-800 bg-zinc-950 px-6 py-4">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
+      {/* Detail Content */}
+      <main className="mx-auto max-w-4xl px-6 py-8">
+        <div className="mb-6">
           <Link
             href="/"
-            className="text-sm font-semibold text-emerald-400 hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition"
           >
             ← Kembali ke Katalog
           </Link>
         </div>
-      </header>
-
-      {/* Detail Content */}
-      <main className="mx-auto max-w-4xl px-6 py-10">
         <div className="border-b border-zinc-800 pb-6">
           <h1 className="text-3xl font-extrabold text-white sm:text-4xl">
             {song.title}

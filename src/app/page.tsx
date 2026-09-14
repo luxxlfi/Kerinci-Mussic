@@ -17,6 +17,7 @@ export default async function HomePage({ searchParams }: PageProps) {
         ? [
             { title: { contains: query, mode: "insensitive" } },
             { artist: { contains: query, mode: "insensitive" } },
+            { content: { contains: query, mode: "insensitive" } },
           ]
         : undefined,
     },
@@ -25,23 +26,6 @@ export default async function HomePage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100 font-sans">
-      {/* Header */}
-      <header className="border-b border-zinc-800 bg-zinc-950 px-6 py-4">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <Link href="/" className="text-xl font-bold tracking-tight text-emerald-400">
-            🎸 ChordGitar.id
-          </Link>
-          <nav className="flex items-center gap-4">
-            <Link
-              href="/request"
-              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500"
-            >
-              Request Lagu
-            </Link>
-          </nav>
-        </div>
-      </header>
-
       {/* Main Container */}
       <main className="mx-auto max-w-5xl px-6 py-10">
         <div className="mb-8">
@@ -53,12 +37,12 @@ export default async function HomePage({ searchParams }: PageProps) {
           </p>
 
           {/* Form Pencarian */}
-          <form method="GET" className="mt-6 flex max-w-md gap-2">
+          <form method="GET" className="mt-6 flex max-w-lg gap-2">
             <input
               type="text"
               name="q"
               defaultValue={query}
-              placeholder="Cari judul lagu atau nama penyanyi..."
+              placeholder="Cari judul lagu, artis, atau penggalan lirik..."
               className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm text-white placeholder-zinc-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
             <button
@@ -67,7 +51,21 @@ export default async function HomePage({ searchParams }: PageProps) {
             >
               Cari
             </button>
+            {query && (
+              <Link
+                href="/"
+                className="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-300 transition hover:bg-zinc-700"
+              >
+                Reset
+              </Link>
+            )}
           </form>
+          {query && (
+            <p className="mt-2 text-xs text-zinc-400">
+              Menampilkan hasil pencarian untuk:{" "}
+              <strong className="text-emerald-400">"{query}"</strong> ({songs.length} lagu ditemukan)
+            </p>
+          )}
         </div>
 
         {/* List Lagu */}
