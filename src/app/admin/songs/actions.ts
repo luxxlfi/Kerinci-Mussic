@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth-guard";
 
@@ -48,6 +49,8 @@ export async function saveSong(formData: FormData) {
     });
   }
 
+  revalidatePath("/admin/songs");
+  revalidatePath("/");
   redirect("/admin/songs");
 }
 
@@ -60,4 +63,24 @@ export async function togglePublishStatus(id: string, currentStatus: "PENDING" |
     where: { id },
     data: { status: newStatus },
   });
+
+  revalidatePath("/admin/songs");
+  revalidatePath("/");
+}
+
+export async function deleteSong(id: string) {
+  await requireRole(["ADMIN", "HEAD_ADMIN"]);
+
+  if (!id) {
+    throw new Error("ID Lagu wajib disertakan.");
+  }
+
+  await prisma.song.delete({
+    where: { id },
+  });
+
+  revalidatePath("/admin/songs");
+  revalidatePath("/");
+
+  return { success: true };
 }

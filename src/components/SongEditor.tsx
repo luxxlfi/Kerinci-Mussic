@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ChordRenderer } from "./ChordRenderer";
 import { saveSong } from "@/app/admin/songs/actions";
+import { DeleteSongButton } from "@/components/DeleteSongButton";
 
 interface SongEditorProps {
   initialData?: {
@@ -127,7 +128,7 @@ export function SongEditor({ initialData }: SongEditorProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-emerald-400 mb-2 font-bold">
+          <label className="block text-sm font-medium text-primary mb-2 font-bold">
             Live Real-Time Preview:
           </label>
           <div className="min-h-[350px] rounded-xl border border-zinc-800 bg-zinc-950 p-6">
@@ -136,10 +137,22 @@ export function SongEditor({ initialData }: SongEditorProps) {
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4">
+      <div className="flex items-center justify-between gap-3 pt-4 border-t border-border">
+        <div>
+          {initialData?.id ? (
+            <DeleteSongButton
+              songId={initialData.id}
+              songTitle={initialData.title}
+              variant="destructive"
+              size="default"
+              className="rounded-xl font-bold"
+            />
+          ) : null}
+        </div>
+
         <button
           type="submit"
-          className="rounded-lg bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-500"
+          className="rounded-xl bg-primary-hover px-6 py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-primary"
         >
           {initialData?.id ? "Simpan Perubahan Lagu" : "Buat Lagu Baru"}
         </button>
