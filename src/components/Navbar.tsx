@@ -87,7 +87,7 @@ export function Navbar() {
             </div>
             <div className="flex flex-col">
               <span className="leading-tight font-extrabold text-primary">
-                ChordGitar.id
+                Chord Lagu Kerinci
               </span>
               <span className="text-[10px] tracking-wider uppercase text-muted-foreground font-semibold">
                 Kerinci Music

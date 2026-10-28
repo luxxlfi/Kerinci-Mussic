@@ -41,8 +41,8 @@ export default async function HomePage({ searchParams }: PageProps) {
           <h1 className="text-4xl font-black tracking-tight text-foreground sm:text-5xl lg:text-6xl">
             Chord Lagu Kerinci
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-muted leading-relaxed">
-            selebew
+          <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-base text-muted leading-relaxed">
+            Kumpulan chord &amp; lirik lagu daerah Kerinci terlengkap dan mudah dimainkan.
           </p>
 
           {/* Form Pencarian Modern */}

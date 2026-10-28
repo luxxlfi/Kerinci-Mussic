@@ -5,15 +5,6 @@ export interface ChordToken {
 
 export type LineToken = ChordToken[];
 
-/**
- * Mengurai teks lirik bernotasi [CHORD] menjadi array token per baris.
- * Contoh: "Aku [C]cinta [G]kamu"
- * Hasil: [
- *   { text: "Aku " },
- *   { chord: "C", text: "cinta " },
- *   { chord: "G", text: "kamu" }
- * ]
- */
 export function parseChordPro(content: string): LineToken[] {
   if (!content) return [];
 
@@ -39,7 +30,6 @@ export function parseChordPro(content: string): LineToken[] {
 
       currentChord = match[1].trim();
 
-      // Tambahkan token baru dengan chord ini
       tokens.push({
         chord: currentChord,
         text: "",

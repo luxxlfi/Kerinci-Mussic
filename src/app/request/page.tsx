@@ -6,15 +6,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Send, Music, MessageSquare, ArrowRight } from "lucide-react";
+import { DeleteRequestButton } from "@/components/DeleteRequestButton";
+import { Send, Music, MessageSquare, ArrowRight, ShieldCheck, User } from "lucide-react";
 
 export default async function RequestPage() {
   const auth = await getCurrentUser();
+  const isAdmin =
+    auth?.profile?.role === "ADMIN" || auth?.profile?.role === "HEAD_ADMIN";
 
-  // Query daftar request user yang sedang login
-  const myRequests = auth?.profile
+  // Jika admin: tampilkan semua request masuk untuk dimoderasi dan dibalas.
+  // Jika user biasa: hanya tampilkan request milik sendiri.
+  const requests = auth?.profile
     ? await prisma.songRequest.findMany({
-        where: { userId: auth.profile.id },
+        where: isAdmin ? undefined : { userId: auth.profile.id },
+        include: {
+          user: true,
+          _count: { select: { messages: true } },
+        },
         orderBy: { createdAt: "desc" },
       })
     : [];
@@ -23,15 +31,27 @@ export default async function RequestPage() {
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500 selection:text-zinc-950">
       <main className="mx-auto max-w-4xl px-4 sm:px-6 py-10">
         <div className="mb-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 mb-3">
-            <MessageSquare className="h-3.5 w-3.5" />
-            <span>Fitur Komunitas Musik</span>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
+              <MessageSquare className="h-3.5 w-3.5" />
+              <span>Fitur Komunitas Musik</span>
+            </div>
+
+            {isAdmin && (
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                <span>Mode Admin Aktif</span>
+              </div>
+            )}
           </div>
+
           <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            Request Lagu Baru
+            {isAdmin ? "Manajemen & Request Lagu" : "Request Lagu Baru"}
           </h1>
           <p className="mt-1.5 text-sm text-zinc-400">
-            Minta lagu favorit atau lagu daerah Kerinci yang belum tersedia di katalog untuk dibuatkan chord gitarnya.
+            {isAdmin
+              ? "Kelola permintaan lagu dari pengguna, tanggapi pesan diskusi, atau hapus percakapan."
+              : "Minta lagu favorit atau lagu daerah Kerinci yang belum tersedia di katalog untuk dibuatkan chord gitarnya."}
           </p>
         </div>
 
@@ -95,52 +115,84 @@ export default async function RequestPage() {
           </CardContent>
         </Card>
 
-        {/* List Request Saya */}
+        {/* List Request */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
               <Music className="h-5 w-5 text-primary" />
-              <span>Daftar Request Saya</span>
+              <span>{isAdmin ? "Semua Permintaan Masuk (Admin)" : "Daftar Request Saya"}</span>
             </h2>
             <span className="text-xs text-zinc-400 font-medium">
-              {myRequests.length} Permintaan
+              {requests.length} Permintaan
             </span>
           </div>
 
-          {myRequests.length === 0 ? (
+          {requests.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/30 p-8 text-center text-zinc-500 text-sm">
-              Kamu belum membuat request lagu. Coba kirimkan lagu yang ingin kamu pelajari melalui formulir di atas!
+              {isAdmin
+                ? "Belum ada permintaan lagu yang masuk dari pengguna."
+                : "Kamu belum membuat request lagu. Coba kirimkan lagu yang ingin kamu pelajari melalui formulir di atas!"}
             </div>
           ) : (
             <div className="space-y-3">
-              {myRequests.map((req) => (
-                <Link
+              {requests.map((req) => (
+                <div
                   key={req.id}
-                  href={`/request/${req.id}`}
-                  className="group block"
+                  className="group relative flex items-center justify-between gap-3 rounded-2xl border border-zinc-800/80 bg-zinc-900/50 p-4 transition-all hover:border-primary-border hover:bg-zinc-900"
                 >
-                  <Card className="border-zinc-800/80 bg-zinc-900/50 hover:bg-zinc-900 hover:border-primary-border transition-all p-4">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <h3 className="font-bold text-white group-hover:text-primary transition-colors">
-                          {req.title}
-                        </h3>
-                        <p className="text-xs text-zinc-400 mt-0.5">
-                          {req.artist || "Tanpa nama artis"}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <Badge
-                          variant={req.status === "OPEN" ? "amber" : "secondary"}
-                        >
-                          {req.status === "OPEN" ? "Sedang Diproses" : "Selesai"}
-                        </Badge>
-                        <ArrowRight className="h-4 w-4 text-zinc-500 group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
-                      </div>
+                  <Link
+                    href={`/request/${req.id}`}
+                    className="flex-1 min-w-0"
+                  >
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-white group-hover:text-primary transition-colors truncate">
+                        {req.title}
+                      </h3>
+                      {req._count?.messages ? (
+                        <span className="inline-flex items-center gap-1 rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-300">
+                          <MessageSquare className="h-2.5 w-2.5" />
+                          {req._count.messages}
+                        </span>
+                      ) : null}
                     </div>
-                  </Card>
-                </Link>
+
+                    <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-zinc-400">
+                      <span>Penyanyi: {req.artist || "Tanpa nama artis"}</span>
+                      {isAdmin && (
+                        <>
+                          <span className="text-zinc-600">•</span>
+                          <span className="inline-flex items-center gap-1 text-zinc-400">
+                            <User className="h-3 w-3 text-zinc-500" />
+                            {req.user.username || req.user.email}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </Link>
+
+                  <div className="flex items-center gap-2.5 shrink-0">
+                    <Badge
+                      variant={req.status === "OPEN" ? "amber" : "secondary"}
+                    >
+                      {req.status === "OPEN" ? "Sedang Diproses" : "Selesai"}
+                    </Badge>
+
+                    {/* Tombol Hapus Request Khusus Admin */}
+                    {isAdmin && (
+                      <DeleteRequestButton
+                        requestId={req.id}
+                        requestTitle={req.title}
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-zinc-500 hover:text-destructive hover:bg-destructive/10"
+                      />
+                    )}
+
+                    <Link href={`/request/${req.id}`}>
+                      <ArrowRight className="h-4 w-4 text-zinc-500 group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+                    </Link>
+                  </div>
+                </div>
               ))}
             </div>
           )}
